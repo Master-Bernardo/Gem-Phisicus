@@ -1,25 +1,33 @@
 /* Bernard Zaborniak s0558930 -08.10.2018 */
 
-float scaleFactor = 700f; // 500 pixels are one meter
+float scaleFactor = 750f; // 500 pixels are one meter
 float cameraMovementSpeed; //how fast does our camera move in this world
 Boolean cameraMovementActivated;
 
 Scene currentScene;
 Boolean loop = true;
 
-float timeScale = 1f;
-float t = 0;                   // Zeitvariable
-float lastT = 0;               // needed to determine deltaT
-static float deltaTime;              // Zeitquant zwischen den Frames 
+float timeScale;
+float tRealLife = 1;       // Zeitfaktor 1:1 
+float vRealLife = 1.388;   // 5 km/h (Fußgänger) 
+float tCosmic = 10000;     // Zeitraffer 1:10000 
+float vCosmic = 1023;      // 1,023 km/s (Mond um Erde) 
+float tBullet = 0.1;       // Zeitlupe 10:1 
+float vBullet = 800;       // 800 m/s (Geschoss) 
+
+float t = 0;               // Zeitvariable
+//float lastT = 0;         // needed to determine deltaT
+static float deltaTime;    // Zeitquant zwischen den Frames 
 float frmRate;             // Screen-Refreshrate 
 
 void setup()
 {
+  timeScale = tRealLife;
   size(1200,1000);
   smooth(8);
   frmRate = 60;        
   frameRate(frmRate);   
-  deltaTime = 1/frmRate;    // Zeitquant 
+  deltaTime = 1/frmRate * timeScale;    // Zeitquant 
   
   // camera settings
   cameraMovementActivated = true;
@@ -45,19 +53,21 @@ void setup()
   ruler.AddChild(ruler10cmMarker5);
   GameObject ruler10cmMarker6 = new GameObject(0.45,0,0,0.1,1, GameObjectType.Rectangle, color(255));
   ruler.AddChild(ruler10cmMarker6);
+  Component rotator = new Rotator(15,true);
+  ruler.AttachComponent(rotator);
   
   //Background
-  GameObject ground = new GameObject(0, 0,0,5,0.2, GameObjectType.Rectangle, color(189,183,107));
+  GameObject ground = new GameObject(0, -0.1,0,5,0.2, GameObjectType.Rectangle, color(189,183,107));
   currentScene.AddObjectToScene(ground);
-  GameObject ground2 = new GameObject(0, 0,0,1.2,0.2, GameObjectType.Rectangle, color(240,230,140));
+  GameObject ground2 = new GameObject(0, -0.1,0,1.2,0.2, GameObjectType.Rectangle, color(240,230,140));
   currentScene.AddObjectToScene(ground2);
   
   //Player1 - left
-  GameObject player1Marker = new GameObject(-0.4,0.09,0,0.1,0.02, GameObjectType.Rectangle, color(255,0,0));
+  GameObject player1Marker = new GameObject(-0.4,-0.01,0,0.1,0.02, GameObjectType.Rectangle, color(255,0,0));
   currentScene.AddObjectToScene(player1Marker);
-  GameObject player1Triangle = new GameObject(-0.6,0.126,0,0.05,0.05, GameObjectType.Triangle, color(#A2DFFF));
+  GameObject player1Triangle = new GameObject(-0.6,0.026,0,0.05,0.05, GameObjectType.Triangle, color(#A2DFFF));
   currentScene.AddObjectToScene(player1Triangle);
-  GameObject player1Wippe = new GameObject(-0.6,0.16, 25,0.25,0.01, GameObjectType.Rectangle, color(#A2DFFF));
+  GameObject player1Wippe = new GameObject(-0.6,0.06, 25,0.25,0.01, GameObjectType.Rectangle, color(#A2DFFF));
   currentScene.AddObjectToScene(player1Wippe);
   GameObject player1WippenDreieck = new GameObject(-0.05,0.02, 0,0.2,3, GameObjectType.Triangle, color(#A2DFFF));
   player1Wippe.AddChild(player1WippenDreieck);
@@ -66,11 +76,11 @@ void setup()
   player1Wippe.AddChild(player1Ball);    //wird erstmal als child angehängt, muss aber später geändert weren falls sich der Ball bewegen soll
   
   //Player 2 - right
-  GameObject player2Marker = new GameObject(0.4, 0.09,0,0.1,0.02, GameObjectType.Rectangle, color(255,0,0));
+  GameObject player2Marker = new GameObject(0.4,-0.01,0,0.1,0.02, GameObjectType.Rectangle, color(255,0,0));
   currentScene.AddObjectToScene(player2Marker);
-  GameObject player2Triangle = new GameObject(0.6,0.126,0,0.05,0.05, GameObjectType.Triangle, color(#A2DFFF));
+  GameObject player2Triangle = new GameObject(0.6,0.026,0,0.05,0.05, GameObjectType.Triangle, color(#A2DFFF));
   currentScene.AddObjectToScene(player2Triangle);
-  GameObject player2Wippe = new GameObject(0.6,0.16,-25,0.25,0.01, GameObjectType.Rectangle, color(#A2DFFF));
+  GameObject player2Wippe = new GameObject(0.6,0.06,-25,0.25,0.01, GameObjectType.Rectangle, color(#A2DFFF));
   currentScene.AddObjectToScene(player2Wippe);
   GameObject player2WippenDreieck = new GameObject(0.05,0.02, 0,0.2,3, GameObjectType.Triangle, color(#A2DFFF));
   player2Wippe.AddChild(player2WippenDreieck);
@@ -79,8 +89,10 @@ void setup()
   player2Wippe.AddChild(player2Ball);
   
   //the ball
-  GameObject ball = new GameObject(0,0.116, 0,0.032,0.032, GameObjectType.Circle, color(#FF7A15));
+  GameObject ball = new GameObject(0,0.016, 0,0.032,0.032, GameObjectType.Circle, color(#FF7A15));
   currentScene.AddObjectToScene(ball);
+  RedBallMovement rBMovement = new RedBallMovement(0.138, true, player1Marker, player2Marker);
+  ball.AttachComponent(rBMovement);
   
   /* for testing 
   GameObject someCircle = new GameObject(width/2, height,45,2,2, GameObjectType.Rectangle, color(255));
@@ -103,9 +115,11 @@ void setup()
 void draw()
 {
   //calculate the time and the time which passed since last frame (deltaTime)
-  t = (float)millis()/1000;
+  /*t = (float)millis()/1000;
   deltaTime = t - lastT;
-  lastT = t;
+  lastT = t;*/
+  
+  t += deltaTime; 
   
   clear();                                                  //clears the whole scene of previously drawn objects
   HandlePlayerInput();                                     //checks if the camera and thus the whole coordinate system of the scene has moved
@@ -169,273 +183,6 @@ void HandlePlayerInput()
   
 }
   
-
-/*holds a collection of Gameobjects and draws the accordingly to their positions relative to the scene origin*/
-class Scene
-{
-  float originX, originY, rotation, scaleX, scaleY; // can also be rotated and scaled
-  ArrayList <GameObject> gameObjects;
-  
-  Scene()
-  {
-    //scene origin is on the bottom left corner at start
-    originX = width/2;  //the origin of the scene in screenSpace
-    originY = height;
-    scaleX = 1;
-    scaleY = 1;
-    rotation = 0;
-    gameObjects = new ArrayList<GameObject>();
-  }
-  
-  void AddObjectToScene(GameObject gameObject)
-  {
-    gameObjects.add(gameObject); 
-  }
-  
-  //runns all the components on the GameObjects
-  void UpdateGameObjects()
-  {
-     for(GameObject gameObject : gameObjects)
-     {
-      gameObject.RunComponents();
-     }
-  }
-  
-  void DrawScene()
-  {
-    
-    background(255,255,255);
-    pushMatrix();
-    translate(originX,originY);
-    for(GameObject gameObject : gameObjects)
-    {
-      gameObject.DrawObject();
-    }
-    popMatrix();
-
-  }
-  
-  PVector SceneToScreenCoordinates(float sceneSpaceX, float sceneSpaceY)
-  {
-    float screenSpaceX = originX + sceneSpaceX;
-    float screenSpaceY = originY - sceneSpaceY;
-    return new PVector(screenSpaceX, screenSpaceY);
-  }
-  
-  // for camera movement
-  void MoveOrigin(float moveX, float moveY)
-  {
-    originX += moveX;
-    originY += moveY;
-  }
-  
-  void CameraZoom(float zoom)
-  {
-    scaleX += zoom/100;
-    scaleY += zoom/100;
-    ;
-  }
-  
-  void CameraRotate(float rotation)
-  {
-    this.rotation += rotation/100;
-    System.out.println(this.rotation);
-  }
-  
-}
-
-
-
-enum GameObjectType
-{
-    Rectangle,
-    Circle,
-    Triangle
-}
-
-/* alle objecte sind standardmäßig 1m x 1m groß wenn der scale of 1 gesetzt ist*/
-class GameObject
-{
-  float posX, posY, rot, scaleX, scaleY; //positions relative to the sceneOrigin
-  GameObjectType type;
-  color objectColor;
-  
-  ArrayList<Component> components;
-  ArrayList<GameObject> children;
-  GameObject parent;
-  
-  GameObject(float posX, float posY, float rot, float scaleX, float scaleY, GameObjectType type, color _objectColor)
-  {
-    this.posX = posX;
-    this.posY = posY;
-    this.rot = rot;
-    this.scaleX = scaleX;
-    this.scaleY = scaleY;
-    this.type = type;
-    objectColor = _objectColor;
-    components = new ArrayList<Component>();
-    children = new ArrayList<GameObject>();
-  }
-  
-  GameObject(float posX, float posY, GameObjectType type, color _objectColor)
-  {
-    this.posX = posX;
-    this.posY = posY;
-    this.rot = 0;
-    this.scaleX = 1;
-    this.scaleY = 1;
-    this.type = type;
-    objectColor = _objectColor;
-    components = new ArrayList<Component>();
-    children = new ArrayList<GameObject>();
-  }
-  
-  void DrawObject()
-  {
-      switch(type)
-      {
-        
-          case Rectangle:
-          
-            rectMode(CENTER);
-            
-            pushMatrix();
-            // move the origin to the pivot point
-            translate(posX * scaleFactor,-posY * scaleFactor); 
-      
-            rotate(radians(rot));
-            
-            // and draw the square at the origin
-            fill(objectColor);
-            if(parent==null) rect(0, 0, scaleX*scaleFactor, scaleY*scaleFactor);
-            else rect(0,0, scaleX*scaleFactor * parent.scaleX, scaleY*scaleFactor * parent.scaleY);
-            
-            for(GameObject child : children)
-            {
-              child.DrawObject();
-            }
-            
-            popMatrix();
-            break;
-            
-          case Circle:
-          
-            pushMatrix();
-            
-            translate(posX * scaleFactor,-posY * scaleFactor); 
-            rotate(radians(rot));
-            fill(objectColor);
-            
-            if(parent==null) ellipse(0, 0, scaleX*scaleFactor, scaleY*scaleFactor);
-            else ellipse(0, 0, scaleX*scaleFactor * parent.scaleX, scaleY*scaleFactor * parent.scaleY);
-            
-            for(GameObject child : children)
-            {
-              child.DrawObject();
-            }
-            
-            popMatrix();
-            break;
-            
-          case Triangle:
-          
-            float h = 0;
-            h = (float)Math.sqrt((Math.pow(1,2)+Math.pow(1/2,2)));
-
-            pushMatrix();
-            translate(posX * scaleFactor,-posY * scaleFactor); 
-            rotate(radians(rot));
-            fill(objectColor);
-            if(parent == null) triangle(
-                    0-h/2 * scaleX * scaleFactor, 0+h/2 * scaleY * scaleFactor,
-                    0+h/2 * scaleX * scaleFactor, 0+h/2 * scaleY * scaleFactor,
-                    0 * scaleX * scaleFactor, 0-h/2 * scaleY * scaleFactor
-                    );
-            else triangle(
-                    0-h/2 * parent.scaleX * scaleX * scaleFactor, 0+h/2 * parent.scaleY * scaleY * scaleFactor,
-                    0+h/2 * parent.scaleX * scaleX * scaleFactor, 0+h/2* parent.scaleY * scaleY * scaleFactor,
-                    0* parent.scaleX * scaleX * scaleFactor, 0-h/2* parent.scaleY * scaleY * scaleFactor
-                    );
-            
-            for(GameObject child : children)
-            {
-              child.DrawObject();
-            }
-            
-            popMatrix();
-            break; 
-        }
-  }
- 
-  void SetParent( GameObject parent)
-  {
-    this.parent = parent;
-  }
-  
-  void AddChild(GameObject child)
-  {
-    children.add(child); 
-    child.SetParent(this);
-  }
-  
-  void RemoveChild(GameObject child)
-  {
-    children.remove(child);
-    child.SetParent(null);
-  }
-    
-  
-  void AttachComponent(Component component)
-  {
-    components.add(component);
-  }
-  
-  void RunComponents()
-  {
-    for(Component component : components)
-     {
-      component.run(this);
-     }
-    for(GameObject child : children)
-    {
-      child.RunComponents();
-    }
-  }
-}
-
-/* can be attached to gameObjects , the run function is called every update on every component*/
-class Component
-{
-  void run(GameObject gameObject)
-  {
-    
-  }
-  
-  Component()
-  {
-    
-  }
-}
-
-//just rotates an object over time - for testing
-class Rotator extends Component
-{
-  float rotationSpeed;
-  Boolean rightDirectedRotation;
-  
-  Rotator(float speed, Boolean right)
-  {
-    rotationSpeed = speed;
-    rightDirectedRotation = right;
-  }
-  
-  void run(GameObject gameObject)
-  {
-    if(rightDirectedRotation) gameObject.rot += rotationSpeed * deltaTime;
-    else gameObject.rot -= rotationSpeed * deltaTime;
-  }
-    
-}
 
 
 
