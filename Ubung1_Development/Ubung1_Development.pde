@@ -5,7 +5,7 @@ float cameraMovementSpeed;          //how fast does our camera move in this worl
 Boolean cameraMovementActivated;    
 
 Scene currentScene;
-//Boolean loop = true;
+UIManager uiManager;
 
 float timeScale;
 float tRealLife = 1;       // Zeitfaktor 1:1 
@@ -93,6 +93,17 @@ void setup()
   currentScene.AddObjectToScene(ball);
   RedBallMovement rBMovement = new RedBallMovement(0.138, true, player1Marker, player2Marker);  //0.138 m/s entsprechen 0.5km/h
   ball.AttachComponent(rBMovement);
+  
+  //UI
+  BallThrowerUbung3 thrower1 = new BallThrowerUbung3(player1Ball);
+  player1Ball.AttachComponent(thrower1);
+  BallThrowerUbung3 thrower2 = new BallThrowerUbung3(player2Ball);
+  player2Ball.AttachComponent(thrower2);
+  
+  uiManager = new UIManager();
+  uiManager.AddButton(new StartButtonUbung3(200,200,100,30,"thrower1", color(255,0,15), color(255,180,180), color(15), thrower1));
+  uiManager.AddButton(new StartButtonUbung3(800,200,100,30,"thrower2", color(255,0,15), color(255,180,180), color(15), thrower2));
+  
  
 }
 
@@ -109,17 +120,7 @@ void draw()
   HandlePlayerInput();                           //checks if the camera and thus the whole coordinate system of the scene has moved
   currentScene.UpdateGameObjects();              //updates all objects - for example move- this will be done here and all compoinents call their methods
   currentScene.DrawScene();                      // draws all the previously updatet gameObjects
-  DisplayUI();
-}
-
-void DisplayUI()
-{
-  //placeholder, for now it just shows text, not the real points of the game
-
-  textSize(32);
-  fill(0);
-  textAlign(CENTER);
-  text("Treffer 0:0", width/2, 30); 
+  uiManager.DisplayUI();
 }
 
 /* moves the scene origin according to our wasdd movement */
@@ -164,5 +165,9 @@ void HandlePlayerInput()
 void mouseWheel(MouseEvent event) {
   float e = event.getCount();
   currentScene.CameraZoom(e);
+}
+
+void mousePressed() {
+  uiManager.MousePressed(mouseX,mouseY);
 }
   

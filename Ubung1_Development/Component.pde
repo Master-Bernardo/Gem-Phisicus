@@ -64,8 +64,40 @@ class RedBallMovement extends Component
       {
         rightMovement = !rightMovement;
       }
+    } 
+  }
+}
+
+class BallThrowerUbung3 extends Component
+{
+  GameObject targetToThrow;
+  float startYPosition;
+  Boolean throwing;
+  float startTime;
+  
+  BallThrowerUbung3(GameObject targetToThrow)
+  {
+    this.targetToThrow = targetToThrow;
+    throwing = false;
+    startYPosition = targetToThrow.posY;
+    startTime = t;
+  }
+  
+  void run(GameObject gameObject)
+  {
+    
+    
+    //physics code
+    if(throwing)
+    {
+      targetToThrow.posY = (float)(-9.81/2f * Math.pow(t-startTime,2f) + 0.001 * (t-startTime) + startYPosition);
     }
     
-    
+    if(targetToThrow.posY==startYPosition) throwing = false;
+  }
+  
+  void ShootBall()
+  {
+    throwing = true;
   }
 }
