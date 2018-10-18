@@ -1,7 +1,7 @@
 /*holds a collection of Gameobjects and draws the accordingly to their positions relative to the scene origin*/
 class Scene
 {
-  float originX, originY, rotation, scaleX, scaleY; // can also be rotated and scaled
+  float originX, originY, rotation, scale; // can also be rotated and scaled
   ArrayList <GameObject> gameObjects;
   
   Scene()
@@ -9,8 +9,7 @@ class Scene
     //scene origin is on the bottom left corner at start
     originX = width/2;  //the origin of the scene in screenSpace
     originY = height -200;
-    scaleX = 1;
-    scaleY = 1;
+    scale = 1;
     rotation = 0;
     gameObjects = new ArrayList<GameObject>();
   }
@@ -33,12 +32,21 @@ class Scene
   {
     
     background(255,255,255);
-    pushMatrix();
-    translate(originX,originY);
+    
+    //camera movement - rotation and scale
+    pushMatrix();          
+    translate(width/2, height/2);
+    rotate(rotation);
+    scale(scale);
+    translate(-width/2, -height/2);
+    translate(originX ,originY);
+    
+    
     for(GameObject gameObject : gameObjects)
     {
       gameObject.DrawObject();
     }
+    
     popMatrix();
 
   }
@@ -59,15 +67,12 @@ class Scene
   
   void CameraZoom(float zoom)
   {
-    scaleX += zoom/100;
-    scaleY += zoom/100;
-    ;
+    scale -= zoom/60;
   }
   
   void CameraRotate(float rotation)
   {
     this.rotation += rotation/100;
-    System.out.println(this.rotation);
   }
   
 }

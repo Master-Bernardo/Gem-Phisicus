@@ -1,11 +1,11 @@
 /* Bernard Zaborniak s0558930 -08.10.2018 */
 
-float scaleFactor = 750f; // 500 pixels are one meter
-float cameraMovementSpeed; //how fast does our camera move in this world
-Boolean cameraMovementActivated;
+float scaleFactor = 750f;           // 750 pixels are one meter
+float cameraMovementSpeed;          //how fast does our camera move in this world
+Boolean cameraMovementActivated;    
 
 Scene currentScene;
-Boolean loop = true;
+//Boolean loop = true;
 
 float timeScale;
 float tRealLife = 1;       // Zeitfaktor 1:1 
@@ -16,9 +16,9 @@ float tBullet = 0.1;       // Zeitlupe 10:1
 float vBullet = 800;       // 800 m/s (Geschoss) 
 
 float t = 0;               // Zeitvariable
-//float lastT = 0;         // needed to determine deltaT
 static float deltaTime;    // Zeitquant zwischen den Frames 
 float frmRate;             // Screen-Refreshrate 
+
 
 void setup()
 {
@@ -91,47 +91,25 @@ void setup()
   //the ball
   GameObject ball = new GameObject(0,0.016, 0,0.032,0.032, GameObjectType.Circle, color(#FF7A15));
   currentScene.AddObjectToScene(ball);
-  RedBallMovement rBMovement = new RedBallMovement(0.138, true, player1Marker, player2Marker);
+  RedBallMovement rBMovement = new RedBallMovement(0.138, true, player1Marker, player2Marker);  //0.138 m/s entsprechen 0.5km/h
   ball.AttachComponent(rBMovement);
-  
-  /* for testing 
-  GameObject someCircle = new GameObject(width/2, height,45,2,2, GameObjectType.Rectangle, color(255));
-  GameObject someOtherCircle = new GameObject(300, 200, 45, 2, 0.5, GameObjectType.Circle, color(255,0,0));
-  GameObject childrenOfRotator = new GameObject(100,0,0,1,1, GameObjectType.Triangle, color(0,15,255f));
-  GameObject childrenOfRect = new GameObject(100,0,0,0.1,0.1, GameObjectType.Rectangle, color(0,255,20f));
-  currentScene.AddObjectToScene(someCircle);
-  currentScene.AddObjectToScene(someOtherCircle);
-  //currentScene.AddObjectToScene(childrenOfRotator);
-  Component rotator = new Rotator(15,true);
-  someOtherCircle.AttachComponent(rotator);
-  someCircle.AddChild(childrenOfRect);
-  someOtherCircle.AddChild(childrenOfRotator);
-  */
-  
-  
-  
+ 
 }
 
 void draw()
 {
-  //calculate the time and the time which passed since last frame (deltaTime)
+  //another way of calculating time
   /*t = (float)millis()/1000;
   deltaTime = t - lastT;
   lastT = t;*/
   
   t += deltaTime; 
   
-  clear();                                                  //clears the whole scene of previously drawn objects
-  HandlePlayerInput();                                     //checks if the camera and thus the whole coordinate system of the scene has moved
-  currentScene.UpdateGameObjects();                         //updates all objects - for later if they have a bahaviour - for example move- this will be done here
-  currentScene.DrawScene();  // draws all the previously updatet gameObjects
+  clear();                                       //clears the whole scene of previously drawn objects
+  HandlePlayerInput();                           //checks if the camera and thus the whole coordinate system of the scene has moved
+  currentScene.UpdateGameObjects();              //updates all objects - for example move- this will be done here and all compoinents call their methods
+  currentScene.DrawScene();                      // draws all the previously updatet gameObjects
   DisplayUI();
-}
-
-// not yet implemented
-void mouseWheel(MouseEvent event) {
-  float e = event.getCount();
-  currentScene.CameraZoom(e);
 }
 
 void DisplayUI()
@@ -142,7 +120,6 @@ void DisplayUI()
   fill(0);
   textAlign(CENTER);
   text("Treffer 0:0", width/2, 30); 
- 
 }
 
 /* moves the scene origin according to our wasdd movement */
@@ -182,139 +159,10 @@ void HandlePlayerInput()
   }
   
 }
-  
 
-
-
-
-
-
-/* Variablendeklaration */ 
-/*
-// Zeitmaßstäbe 
-float timeScale;           // Zeitskalierungsfaktor 
-float tRealLife = 1;       // Zeitfaktor 1:1 
-float vRealLife = 1.388;   // 5 km/h (Fußgänger) 
-float tCosmic = 10000;     // Zeitraffer 1:10000 
-float vCosmic = 1023;      // 1,023 km/s (Mond um Erde) 
-float tBullet = 0.1;       // Zeitlupe 10:1 
-float vBullet = 800;       // 800 m/s (Geschoss) 
-
-float t = 0;               // Zeitvariable
-float dt;                  // Zeitquant 
-float frmRate;             // Screen-Refreshrate 
-
-String modus;
-
-void setup () 
-  { 
-    size(1200,1000);
-    frmRate = 50;          // Bildwechselfrequenz: 50 per sec 
-    frameRate(frmRate);   
-    dt = 1/frmRate;        // Zeitquant 
-    modus = "realLife";
-    
-  } 
-  
-void draw()              // Hauptprogramm 
-  { 
-    // Zeitmaßstäbe 
-    switch (modus) 
-      { 
-        case "realLife": timeScale = tRealLife;  // Fußgänger 
-                  //v = vRealLife; 
-                  timeScale = tRealLife;
-                  break; 
-        case "cosmic": timeScale = tCosmic;    // Mond um Erde 
-                  //v = vCosmic; 
-                  timeScale = tCosmic;
-                  break;   
-        case "slowMo": timeScale = tBullet;    // Geschoss 
-                  //v = vBullet; 
-                  timeScale = tBullet;
-                  break;   
-      } 
-
-  
-    t += timeScale*dt; 
-
-  } 
-*/
-
-
-
-
-/* another
-
-void draw()
-{
-  clear();
-  background(122,5,122);
-  if(mousePressed && mouseButton == LEFT)
-  {
-     myBall = new MovingBall(0,height/2,5,20);
-  }
-  
-  if(myBall!=null)
-  {
-    myBall.MoveBall();
-    myBall.DrawBall();
-  }
-  //clear();
-  //background(155,15,155);
-  rectMode(CENTER);
-  fill(255,0,0,50);
-  rect(mouseX,mouseY,50,50);
-  
-  
-  
-  textSize(32); // Set text size to 32
-  fill(0);
-  text("LAX", 0, 40);
+// not yet implemented
+void mouseWheel(MouseEvent event) {
+  float e = event.getCount();
+  currentScene.CameraZoom(e);
 }
-
-void mousePressed() {
-  if (mouseButton == RIGHT) {
-    if(!loop){
-      loop();
-      loop = true;
-    }
-    else{
-      noLoop();
-      loop = false;
-    }
-  }
-}
-
-class MovingBall
-{
-  int speed;
-  int currentX = 0;
-  int currentY = 0;
-  int size;
   
-  MovingBall(int x, int y,int _speed, int _size)
-  {
-    currentX = x;
-    currentY = y;
-    speed = _speed;
-    size = _size;
-  }
-  
-  void MoveBall()
-  {
-    currentX += speed;
-  }
-  
-  void DrawBall()
-  {
-    ellipse(currentX,currentY,size,size);
-  }
-  
-  void draw(){
-    fill(0,255,0);
-    rect(50,50,500,500);
-  }
-}
-
-*/

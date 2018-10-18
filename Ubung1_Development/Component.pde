@@ -57,8 +57,6 @@ class RedBallMovement extends Component
     if(gameObject.posX > rightMarker.posX)
     {
       rightMovement = !rightMovement;
-      System.out.println("gameObj: " + gameObject.posX);
-      System.out.println("rightMarker: " + rightMarker.posX);
     }
     }else{
       gameObject.posX -= movementSpeed * deltaTime;
