@@ -125,13 +125,14 @@ class GameObject
   void AttachComponent(Component component)
   {
     components.add(component);
+    component.SetGameObject(this);
   }
 
   void RunComponents()
   {
     for (Component component : components)
     {
-      component.run(this);
+      component.run();
     }
     for (GameObject child : children)
     {

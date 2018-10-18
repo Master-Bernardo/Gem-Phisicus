@@ -26,7 +26,7 @@ class StartButtonUbung3 extends Button
     }
   }
   
-  void Update()
+  void UpdateButton()
   {
     if(!ballThrower.throwing) active = true;
     else active = false;

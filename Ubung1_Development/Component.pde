@@ -1,7 +1,9 @@
 /* can be attached to gameObjects , the run function is called every update on every component*/
 class Component
 {
-  void run(GameObject gameObject)
+  GameObject gameObject;
+  
+  void run()
   {
     
   }
@@ -9,6 +11,11 @@ class Component
   Component()
   {
     
+  }
+  
+  void SetGameObject(GameObject gameObject)
+  {
+    this.gameObject = gameObject;
   }
 }
 
@@ -24,7 +31,7 @@ class Rotator extends Component
     rightDirectedRotation = right;
   }
   
-  void run(GameObject gameObject)
+  void run()
   {
     if(rightDirectedRotation) gameObject.rot += rotationSpeed * deltaTime;
     else gameObject.rot -= rotationSpeed * deltaTime;
@@ -48,7 +55,7 @@ class RedBallMovement extends Component
     this.rightMarker = rightMarker;
   }
   
-  void run(GameObject gameObject)
+  void run()
   {
     if(rightMovement)
     {
@@ -70,34 +77,38 @@ class RedBallMovement extends Component
 
 class BallThrowerUbung3 extends Component
 {
-  GameObject targetToThrow;
+
   float startYPosition;
   Boolean throwing;
   float startTime;
   
-  BallThrowerUbung3(GameObject targetToThrow)
+  BallThrowerUbung3()
   {
-    this.targetToThrow = targetToThrow;
     throwing = false;
-    startYPosition = targetToThrow.posY;
     startTime = t;
   }
   
-  void run(GameObject gameObject)
+  void run()
   {
-    
-    
     //physics code
     if(throwing)
     {
-      targetToThrow.posY = (float)(-9.81/2f * Math.pow(t-startTime,2f) + 0.001 * (t-startTime) + startYPosition);
+      gameObject.posY = (float)(-9.81/2f * Math.pow(t-startTime,2f) + 4 * (t-startTime) + startYPosition);
     }
     
-    if(targetToThrow.posY==startYPosition) throwing = false;
+    if(gameObject.posY<=startYPosition + 0.01 && gameObject.posY>=startYPosition - 0.01) throwing = false;
+    System.out.println("ypos: " + gameObject.posY);
+  }
+  
+  void SetGameObject(GameObject gameObject)
+  {
+    this.gameObject = gameObject;
+    startYPosition = gameObject.posY;
   }
   
   void ShootBall()
   {
     throwing = true;
+    startTime = t;
   }
 }

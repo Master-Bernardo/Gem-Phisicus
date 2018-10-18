@@ -72,8 +72,8 @@ void setup()
   GameObject player1WippenDreieck = new GameObject(-0.05,0.02, 0,0.2,3, GameObjectType.Triangle, color(#A2DFFF));
   player1Wippe.AddChild(player1WippenDreieck);
   
-  GameObject player1Ball = new GameObject(-0.1,0.03, 0,0.2,4.7, GameObjectType.Circle, color(230));
-  player1Wippe.AddChild(player1Ball);    //wird erstmal als child angehängt, muss aber später geändert weren falls sich der Ball bewegen soll
+  GameObject player1Ball = new GameObject(-0.68,0.13, 0,0.05,0.05, GameObjectType.Circle, color(230));
+  currentScene.AddObjectToScene(player1Ball);    //wird erstmal als child angehängt, muss aber später geändert weren falls sich der Ball bewegen soll
   
   //Player 2 - right
   GameObject player2Marker = new GameObject(0.4,-0.01,0,0.1,0.02, GameObjectType.Rectangle, color(255,0,0));
@@ -85,8 +85,8 @@ void setup()
   GameObject player2WippenDreieck = new GameObject(0.05,0.02, 0,0.2,3, GameObjectType.Triangle, color(#A2DFFF));
   player2Wippe.AddChild(player2WippenDreieck);
   
-  GameObject player2Ball = new GameObject(0.1,0.03, 0,0.2,4.7, GameObjectType.Circle, color(230));
-  player2Wippe.AddChild(player2Ball);
+  GameObject player2Ball = new GameObject(0.68,0.13, 0,0.05,0.05, GameObjectType.Circle, color(230));
+   currentScene.AddObjectToScene(player2Ball);
   
   //the ball
   GameObject ball = new GameObject(0,0.016, 0,0.032,0.032, GameObjectType.Circle, color(#FF7A15));
@@ -95,9 +95,9 @@ void setup()
   ball.AttachComponent(rBMovement);
   
   //UI
-  BallThrowerUbung3 thrower1 = new BallThrowerUbung3(player1Ball);
+  BallThrowerUbung3 thrower1 = new BallThrowerUbung3();
   player1Ball.AttachComponent(thrower1);
-  BallThrowerUbung3 thrower2 = new BallThrowerUbung3(player2Ball);
+  BallThrowerUbung3 thrower2 = new BallThrowerUbung3();
   player2Ball.AttachComponent(thrower2);
   
   uiManager = new UIManager();
