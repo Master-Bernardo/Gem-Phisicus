@@ -1,7 +1,7 @@
 class StartButtonUbung3 extends Button
 {
   
-   // active ist true wenn der ball in der Ausgangsposition verharrt
+  // active ist true wenn der ball in der Ausgangsposition verharrt
   BallThrowerUbung3 ballThrower; //der zuständige Component
   
   

@@ -94,15 +94,17 @@ void setup()
   RedBallMovement rBMovement = new RedBallMovement(0.138, true, player1Marker, player2Marker);  //0.138 m/s entsprechen 0.5km/h
   ball.AttachComponent(rBMovement);
   
-  //UI
+  //Die Components für den freien Fall der Übung 3
   BallThrowerUbung3 thrower1 = new BallThrowerUbung3();
   player1Ball.AttachComponent(thrower1);
   BallThrowerUbung3 thrower2 = new BallThrowerUbung3();
   player2Ball.AttachComponent(thrower2);
   
+  //UI
+  
   uiManager = new UIManager();
-  uiManager.AddButton(new StartButtonUbung3(200,200,100,30,"thrower1", color(255,0,15), color(255,180,180), color(15), thrower1));
-  uiManager.AddButton(new StartButtonUbung3(800,200,100,30,"thrower2", color(255,0,15), color(255,180,180), color(15), thrower2));
+  uiManager.AddButton(new StartButtonUbung3(170,850,150,50,"thrower1", color(0,255,100), color(255,180,180), color(15), thrower1));
+  uiManager.AddButton(new StartButtonUbung3(1030,850,150,50,"thrower2", color(0,255,100), color(255,180,180), color(15), thrower2));
   
  
 }
@@ -161,7 +163,6 @@ void HandlePlayerInput()
   
 }
 
-// not yet implemented
 void mouseWheel(MouseEvent event) {
   float e = event.getCount();
   currentScene.CameraZoom(e);

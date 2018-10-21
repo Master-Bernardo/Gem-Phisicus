@@ -1,4 +1,5 @@
 class UIManager
+/* kümmer sich um alle Buttons und Texte - updatet die und zeichnet sie im screenspace - das heißt beim rauszoomen aus der Scene bleibt das UI gleich*/
 {
   ArrayList<Button> buttons;
   
@@ -65,7 +66,7 @@ class UIManager
       //text(button.text, button.posX-button.scaleX/2, button.posY-button.scaleY/2, button.posX+button.scaleX/2, button.posY+button.scaleY/2);
       fill(0);
       textAlign(CENTER);
-      text(button.text, button.posX, button.posY);
+      text(button.text, button.posX, button.posY+10);
     }
   }
 }

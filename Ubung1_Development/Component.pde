@@ -81,29 +81,40 @@ class BallThrowerUbung3 extends Component
   float startYPosition;
   Boolean throwing;
   float startTime;
+  float startVelocity;
+  float lastPosY;        //the position of the last frame - needed for stopping the ball
+
   
   BallThrowerUbung3()
   {
     throwing = false;
     startTime = t;
+    startVelocity = 4.8; //anfangsgeschwindigkeit beträgt 4,8 m/s
   }
   
   void run()
   {
-    //physics code
+    //physics Formel für freien Fall aus der Übung
     if(throwing)
     {
-      gameObject.posY = (float)(-9.81/2f * Math.pow(t-startTime,2f) + 4 * (t-startTime) + startYPosition);
+      gameObject.posY = (float)(-9.81/2f * Math.pow(t-startTime,2f) + startVelocity * (t-startTime) + startYPosition);
     }
     
-    if(gameObject.posY<=startYPosition + 0.01 && gameObject.posY>=startYPosition - 0.01) throwing = false;
-    System.out.println("ypos: " + gameObject.posY);
+    //ankommen prüfen
+    if(lastPosY > startYPosition && gameObject.posY < startYPosition)
+    {
+      throwing = false;
+      gameObject.posY = startYPosition;
+    }
+    
+    lastPosY = gameObject.posY;
   }
   
   void SetGameObject(GameObject gameObject)
   {
     this.gameObject = gameObject;
     startYPosition = gameObject.posY;
+    lastPosY = startYPosition;
   }
   
   void ShootBall()

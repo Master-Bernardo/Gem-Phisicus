@@ -3,8 +3,8 @@
 enum GameObjectType
 {
   Rectangle, 
-    Circle, 
-    Triangle
+  Circle, 
+  Triangle
 }
 
 
