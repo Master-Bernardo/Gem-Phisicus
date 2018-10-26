@@ -43,7 +43,7 @@ class UIManager
     }
     for(Slider slider: sliders)
     {
-      if(mousePosX < slider.posX + slider.scaleX/2 && mousePosX > slider.posX - slider.scaleX/2 && mousePosY < slider.posY + slider.scaleY/2 && mousePosY > slider.posY - slider.scaleY/2)
+      if(mousePosX < slider.posX + slider.scaleX/2 && mousePosX > slider.posX - slider.scaleX/2 && mousePosY < slider.posY + slider.scaleY/2 + 10 && mousePosY > slider.posY - slider.scaleY/2 - 10)
       {
         slider.OnClick();
       }
@@ -92,8 +92,10 @@ class UIManager
       rectMode(CENTER);
       fill(slider.sliderColor);
       rect(slider.posX, slider.posY, slider.scaleX, slider.scaleY);
+      textSize(12);
+      text(slider.text + slider.GetValue(), slider.posX, slider.posY+((slider.scaleY/2)*1.2));
       fill(color(255f,150f,100f));
-      ellipse(slider.posX, slider.posY+slider.scaleY/2- (slider.sliderPosition*slider.scaleY), slider.scaleX/2, slider.scaleX/2);
+      ellipse(slider.posX, slider.posY+slider.scaleY/2- (slider.sliderPosition*slider.scaleY), slider.scaleX*2, slider.scaleX*2);
     }
   }
 }

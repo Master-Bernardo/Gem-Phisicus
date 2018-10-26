@@ -107,7 +107,7 @@ void setup()
   /*Übung 4 Objekte*/
   
   BallThrowerUbung4 throwerSchrag1 = new BallThrowerUbung4();
-  throwerSchrag1.SetShootProperties(2, 45, true);
+  throwerSchrag1.SetShootProperties(3.5, 45, true);
   player1Ball.AttachComponent(throwerSchrag1);
   BallThrowerUbung4 throwerSchrag2 = new BallThrowerUbung4();
   throwerSchrag2.SetShootProperties(2, 45, false);
@@ -121,7 +121,8 @@ void setup()
   uiManager.AddButton(new StartButtonUbung4(170,850,150,50,"thrower1", color(0,255,100), color(255,180,180), color(15), throwerSchrag1));
   uiManager.AddButton(new StartButtonUbung4(1030,850,150,50,"thrower2", color(0,255,100), color(255,180,180), color(15), throwerSchrag2));
   
-  uiManager.AddSlider(new Slider(300, 600, 50, 200, "alala", color(0f,0f,200f), 0.9));
+  uiManager.AddSlider(new Slider(100, 400, 10, 200, "starting velocity: ", color(0f,0f,200f), 0.9, throwerSchrag1));
+  uiManager.AddSlider(new Slider(1100, 400, 10, 200, "starting velocity: ", color(0f,0f,200f), 0.9, throwerSchrag2));
   
   
   
