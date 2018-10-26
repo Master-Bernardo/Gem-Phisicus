@@ -19,6 +19,8 @@ float t = 0;               // Zeitvariable
 static float deltaTime;    // Zeitquant zwischen den Frames 
 float frmRate;             // Screen-Refreshrate 
 
+static float gravitation = 9.81f;
+
 
 void setup()
 {
@@ -72,7 +74,7 @@ void setup()
   GameObject player1WippenDreieck = new GameObject(-0.05,0.02, 0,0.2,3, GameObjectType.Triangle, color(#A2DFFF));
   player1Wippe.AddChild(player1WippenDreieck);
   
-  GameObject player1Ball = new GameObject(-0.68,0.13, 0,0.05,0.05, GameObjectType.Circle, color(230));
+  GameObject player1Ball = new GameObject(-0.68,0.13, 0,0.03,0.03, GameObjectType.Circle, color(230));
   currentScene.AddObjectToScene(player1Ball);    //wird erstmal als child angehängt, muss aber später geändert weren falls sich der Ball bewegen soll
   
   //Player 2 - right
@@ -85,7 +87,7 @@ void setup()
   GameObject player2WippenDreieck = new GameObject(0.05,0.02, 0,0.2,3, GameObjectType.Triangle, color(#A2DFFF));
   player2Wippe.AddChild(player2WippenDreieck);
   
-  GameObject player2Ball = new GameObject(0.68,0.13, 0,0.05,0.05, GameObjectType.Circle, color(230));
+  GameObject player2Ball = new GameObject(0.68,0.13, 0,0.03,0.03, GameObjectType.Circle, color(230));
    currentScene.AddObjectToScene(player2Ball);
   
   //the ball
@@ -94,17 +96,34 @@ void setup()
   RedBallMovement rBMovement = new RedBallMovement(0.138, true, player1Marker, player2Marker);  //0.138 m/s entsprechen 0.5km/h
   ball.AttachComponent(rBMovement);
   
+  /*Übung 3 Objekte*/
+  
   //Die Components für den freien Fall der Übung 3
   BallThrowerUbung3 thrower1 = new BallThrowerUbung3();
   player1Ball.AttachComponent(thrower1);
   BallThrowerUbung3 thrower2 = new BallThrowerUbung3();
   player2Ball.AttachComponent(thrower2);
   
+  /*Übung 4 Objekte*/
+  
+  BallThrowerUbung4 throwerSchrag1 = new BallThrowerUbung4();
+  throwerSchrag1.SetShootProperties(2, 45, true);
+  player1Ball.AttachComponent(throwerSchrag1);
+  BallThrowerUbung4 throwerSchrag2 = new BallThrowerUbung4();
+  throwerSchrag2.SetShootProperties(2, 45, false);
+  player2Ball.AttachComponent(throwerSchrag2);
+  
   //UI
   
   uiManager = new UIManager();
-  uiManager.AddButton(new StartButtonUbung3(170,850,150,50,"thrower1", color(0,255,100), color(255,180,180), color(15), thrower1));
-  uiManager.AddButton(new StartButtonUbung3(1030,850,150,50,"thrower2", color(0,255,100), color(255,180,180), color(15), thrower2));
+  //uiManager.AddButton(new StartButtonUbung3(170,850,150,50,"thrower1", color(0,255,100), color(255,180,180), color(15), thrower1));
+  //uiManager.AddButton(new StartButtonUbung3(1030,850,150,50,"thrower2", color(0,255,100), color(255,180,180), color(15), thrower2));
+  uiManager.AddButton(new StartButtonUbung4(170,850,150,50,"thrower1", color(0,255,100), color(255,180,180), color(15), throwerSchrag1));
+  uiManager.AddButton(new StartButtonUbung4(1030,850,150,50,"thrower2", color(0,255,100), color(255,180,180), color(15), throwerSchrag2));
+  
+  uiManager.AddSlider(new Slider(300, 600, 50, 200, "alala", color(0f,0f,200f), 0.9));
+  
+  
   
  
 }
@@ -165,7 +184,7 @@ void HandlePlayerInput()
 
 void mouseWheel(MouseEvent event) {
   float e = event.getCount();
-  currentScene.CameraZoom(e);
+  if(cameraMovementActivated) currentScene.CameraZoom(e);
 }
 
 void mousePressed() {

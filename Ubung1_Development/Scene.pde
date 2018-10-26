@@ -3,6 +3,7 @@ class Scene
 {
   float originX, originY, rotation, scale; // can also be rotated and scaled
   ArrayList <GameObject> gameObjects;
+  Boolean cameraMovementActivated = true;
   
   Scene()
   {
@@ -19,7 +20,7 @@ class Scene
     gameObjects.add(gameObject); 
   }
   
-  //runns all the components on the GameObjects
+  //runs all the components on the GameObjects
   void UpdateGameObjects()
   {
      for(GameObject gameObject : gameObjects)
@@ -34,13 +35,12 @@ class Scene
     background(255,255,255);
     
     //camera movement - rotation and scale
-    pushMatrix();          
+    pushMatrix();        
     translate(width/2, height/2);
     rotate(rotation);
     scale(scale);
     translate(-width/2, -height/2);
     translate(originX ,originY);
-    
     
     for(GameObject gameObject : gameObjects)
     {

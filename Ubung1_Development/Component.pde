@@ -97,7 +97,7 @@ class BallThrowerUbung3 extends Component
     //physics Formel für freien Fall aus der Übung
     if(throwing)
     {
-      gameObject.posY = (float)(-9.81/2f * Math.pow(t-startTime,2f) + startVelocity * (t-startTime) + startYPosition);
+      gameObject.posY = (float)(-gravitation/2f * Math.pow(t-startTime,2f) + startVelocity * (t-startTime) + startYPosition);
     }
     
     //ankommen prüfen
@@ -121,5 +121,64 @@ class BallThrowerUbung3 extends Component
   {
     throwing = true;
     startTime = t;
+  }
+}
+
+class BallThrowerUbung4 extends Component
+{
+
+  float startYPosition;
+  float startXPosition;
+  Boolean throwing;
+  float startTime;
+  float startVelocity;  
+  float angle; //alpha - die Rotation in welche richtung der wurf beginnt
+  Boolean rightDirection; //true falls wir nach rechts schießen, false falls wir nach links schießen
+
+
+  
+  BallThrowerUbung4()
+  {
+    throwing = false;
+  }
+  
+  void run()
+  {
+    //physics Formel für freien Fall aus der Übung
+    if(throwing)
+    {
+      float velocityY = (float)(startVelocity * Math.sin(radians(angle)));
+      float velocityX = (float)(startVelocity * Math.cos(radians(angle)));
+      gameObject.posY = (float)(startYPosition + velocityY * (t-startTime) - gravitation/2 * Math.pow((t-startTime),2)); 
+      if(rightDirection) 
+      {
+        gameObject.posX = (float)(startXPosition + velocityX * (t-startTime));
+      }
+        else
+      {
+        gameObject.posX = (float)(startXPosition - velocityX * (t-startTime));
+      }
+    }
+  }
+  
+  void SetGameObject(GameObject gameObject)
+  {
+    this.gameObject = gameObject;
+  }
+  
+  void SetShootProperties(float startVelocity, float angle, Boolean rightDirection)
+  {
+    this.rightDirection = rightDirection;
+    this.startVelocity = startVelocity;
+    this.angle = angle;
+  }
+  
+  void ShootBall()
+  {
+    throwing = true;
+    startYPosition = gameObject.posY;
+    startXPosition = gameObject.posX;
+    startTime = t;
+    
   }
 }

@@ -2,10 +2,12 @@ class UIManager
 /* kümmer sich um alle Buttons und Texte - updatet die und zeichnet sie im screenspace - das heißt beim rauszoomen aus der Scene bleibt das UI gleich*/
 {
   ArrayList<Button> buttons;
+  ArrayList<Slider> sliders;
   
   UIManager()
   {
     buttons = new ArrayList<Button>();
+    sliders = new ArrayList<Slider>();
   }
   
   void AddButton(Button button)
@@ -13,11 +15,16 @@ class UIManager
     buttons.add((button));
   }
   
+  void AddSlider(Slider slider)
+  {
+    sliders.add(slider);
+  }
+  
   void DisplayUI()
   {
     //placeholder, for now it just shows text, not the real points of the game
-    UpdateButtons();
-    DrawButtons();
+    UpdateUIElements();
+    DrawUIElements();
   
     textSize(32);
     fill(0);
@@ -34,18 +41,29 @@ class UIManager
         button.OnClick();
       }
     }
+    for(Slider slider: sliders)
+    {
+      if(mousePosX < slider.posX + slider.scaleX/2 && mousePosX > slider.posX - slider.scaleX/2 && mousePosY < slider.posY + slider.scaleY/2 && mousePosY > slider.posY - slider.scaleY/2)
+      {
+        slider.OnClick();
+      }
+    }
   }
   
   
-  void UpdateButtons()
+  void UpdateUIElements()
   {
     for(Button button: buttons)
     {
       button.UpdateButton();
     }
+    for (Slider slider: sliders)
+    {
+      slider.UpdateSlider();
+    }
   }
   
-  void DrawButtons()
+  void DrawUIElements()
   {
     for(Button button: buttons)
     {
@@ -67,6 +85,15 @@ class UIManager
       fill(0);
       textAlign(CENTER);
       text(button.text, button.posX, button.posY+10);
+    }
+    
+    for(Slider slider: sliders)
+    {
+      rectMode(CENTER);
+      fill(slider.sliderColor);
+      rect(slider.posX, slider.posY, slider.scaleX, slider.scaleY);
+      fill(color(255f,150f,100f));
+      ellipse(slider.posX, slider.posY+slider.scaleY/2- (slider.sliderPosition*slider.scaleY), slider.scaleX/2, slider.scaleX/2);
     }
   }
 }
