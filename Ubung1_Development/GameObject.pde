@@ -139,4 +139,32 @@ class GameObject
       child.RunComponents();
     }
   }
+  
+  //for rectangle only, returns the 4 Points of a rectangle in scene space
+  PVector[] GetRectanglePoints()
+  {
+    PVector[] pointsToReturn = new PVector[4];
+    
+    
+    //verschiebe den Vector Mittelpukt einmal um den Vector mit der Länge der scales in richtung der Rotation
+    
+    //upper left
+    PVector upperLeft =  new PVector(-scaleX/2, +scaleY/2);
+    upperLeft.rotate(-radians(rot));
+    pointsToReturn[0] = new PVector(posX + upperLeft.x, posY + upperLeft.y);
+    //upperRight
+    PVector upperRight =  new PVector(+scaleX/2, +scaleY/2);
+    upperRight.rotate(-radians(rot));
+    pointsToReturn[1] = new PVector(posX + upperRight.x, posY + upperRight.y);
+    // lower left
+    PVector lowerLeft =  new PVector(-scaleX/2, -scaleY/2);
+    lowerLeft.rotate(-radians(rot));
+    pointsToReturn[2] = new PVector(posX + lowerLeft.x, posY + lowerLeft.y);
+    // lower right
+    PVector lowerRight =  new PVector(+scaleX/2, -scaleY/2);
+    lowerRight.rotate(-radians(rot));
+    pointsToReturn[3] = new PVector(posX + lowerRight.x, posY + lowerRight.y);
+    
+    return pointsToReturn;
+  }
 }

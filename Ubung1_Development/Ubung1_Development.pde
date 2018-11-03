@@ -71,6 +71,13 @@ void setup()
   currentScene.AddObjectToScene(player1Triangle);
   GameObject player1Wippe = new GameObject(-0.6,0.06, 25,0.25,0.01, GameObjectType.Rectangle, color(#A2DFFF));
   currentScene.AddObjectToScene(player1Wippe);
+  PVector[] testVectors = player1Wippe.GetRectanglePoints();
+  for(PVector vector: testVectors)
+  {
+    System.out.println(vector);
+    GameObject testTriangle = new GameObject(vector.x,vector.y,0,0.05,0.05, GameObjectType.Circle, color(#A2DFFF));
+    currentScene.AddObjectToScene(testTriangle);
+  }
   GameObject player1WippenDreieck = new GameObject(-0.05,0.02, 0,0.2,3, GameObjectType.Triangle, color(#A2DFFF));
   player1Wippe.AddChild(player1WippenDreieck);
   
@@ -84,6 +91,15 @@ void setup()
   currentScene.AddObjectToScene(player2Triangle);
   GameObject player2Wippe = new GameObject(0.6,0.06,-25,0.25,0.01, GameObjectType.Rectangle, color(#A2DFFF));
   currentScene.AddObjectToScene(player2Wippe);
+  
+  PVector[] testVectors2 = player2Wippe.GetRectanglePoints();
+  for(PVector vector: testVectors2)
+  {
+    System.out.println(vector);
+    GameObject testTriangle = new GameObject(vector.x,vector.y,0,0.05,0.05, GameObjectType.Circle, color(#A2DFFF));
+    currentScene.AddObjectToScene(testTriangle);
+  }
+  
   GameObject player2WippenDreieck = new GameObject(0.05,0.02, 0,0.2,3, GameObjectType.Triangle, color(#A2DFFF));
   player2Wippe.AddChild(player2WippenDreieck);
   
