@@ -91,15 +91,15 @@ void setup()
   currentScene.AddObjectToScene(player2Triangle);
   GameObject player2Wippe = new GameObject(0.6,0.06,-25,0.25,0.01, GameObjectType.Rectangle, color(#A2DFFF));
   currentScene.AddObjectToScene(player2Wippe);
-  
+  /*
   PVector[] testVectors2 = player2Wippe.GetRectanglePoints();
   for(PVector vector: testVectors2)
   {
-    System.out.println(vector);
+   // System.out.println(vector);
     GameObject testTriangle = new GameObject(vector.x,vector.y,0,0.05,0.05, GameObjectType.Circle, color(#A2DFFF));
     currentScene.AddObjectToScene(testTriangle);
   }
-  
+  */
   GameObject player2WippenDreieck = new GameObject(0.05,0.02, 0,0.2,3, GameObjectType.Triangle, color(#A2DFFF));
   player2Wippe.AddChild(player2WippenDreieck);
   
@@ -121,13 +121,25 @@ void setup()
   player2Ball.AttachComponent(thrower2);
   
   /*Übung 4 Objekte*/
+  //der Collider sammller der Wippen
+  CollidersUbung4 colliderSammleUbung4 = new CollidersUbung4(player1Wippe,player2Wippe);
   
-  BallThrowerUbung4 throwerSchrag1 = new BallThrowerUbung4();
+  BallThrowerUbung4 throwerSchrag1 = new BallThrowerUbung4(colliderSammleUbung4);
   throwerSchrag1.SetShootProperties(3.5, 45, true);
   player1Ball.AttachComponent(throwerSchrag1);
-  BallThrowerUbung4 throwerSchrag2 = new BallThrowerUbung4();
+  BallThrowerUbung4 throwerSchrag2 = new BallThrowerUbung4(colliderSammleUbung4);
   throwerSchrag2.SetShootProperties(2, 45, false);
   player2Ball.AttachComponent(throwerSchrag2);
+  
+  
+  
+  //zeichne Funktion
+  for(float y = 0; y<=0.5; y=y+0.001)
+  {
+    //System.out.println((y*1f-colliderSammleUbung4.nLinks)/colliderSammleUbung4.steigungLinks);
+    GameObject testball = new GameObject((y*1f-colliderSammleUbung4.nLinks)/colliderSammleUbung4.steigungLinks,y,0,0.005,0.005, GameObjectType.Circle, color(#A2DFFF));
+    currentScene.AddObjectToScene(testball);
+  }
   
   //UI
   

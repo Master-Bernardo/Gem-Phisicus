@@ -19,6 +19,7 @@ class Slider
     this.sliderColor = sliderColor;
     sliderPosition = startSliderPosition;
     this.ballThrowerUbung4 = ballThrowerUbung4;
+    ballThrowerUbung4.SetStartVelocity( GetValue());
   }
   
   void UpdateSlider()
@@ -30,7 +31,7 @@ class Slider
   {
     //execute the code on click
     sliderPosition = (float)-(mouseY-(posY+scaleY/2))/scaleY;
-    ballThrowerUbung4.startVelocity = GetValue();
+    ballThrowerUbung4.SetStartVelocity( GetValue());
   }
   
   //retunrs the value determines by the min and max
@@ -39,6 +40,7 @@ class Slider
     float value = maxValue*sliderPosition;
     if (value>maxValue) value = maxValue;
     else if(value<minValue) value = minValue;
+    //System.out.println(value);
     return value;
   }
 }
