@@ -45,7 +45,7 @@ class CollidersUbung4
       return null;
     }
   }
-  
+
   PVector CollidesWithWippeRight(GameObject ball)
   {
     float y = steigungRechts * ball.posX + nRechts;
