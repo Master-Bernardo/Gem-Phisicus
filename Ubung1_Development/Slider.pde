@@ -5,7 +5,7 @@ class Slider
   String text;
   float sliderPosition; //slider position in Percent
   //max and min values we want to recieve
-  float maxValue = 3.5;
+  float maxValue = 10;
   float minValue = 0; //immer 0
   BallThrowerUbung4 ballThrowerUbung4;
   

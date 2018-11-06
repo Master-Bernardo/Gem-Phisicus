@@ -24,7 +24,7 @@ static float gravitation = 9.81f;
 
 void setup()
 {
-  timeScale = 0.25;
+  timeScale = 0.1;
   size(1200,1000);
   smooth(8);
   frmRate = 60;        
@@ -135,10 +135,12 @@ void setup()
   CollidersUbung4 colliderSammleUbung4 = new CollidersUbung4(player1Wippe,player2Wippe);
   
   BallThrowerUbung4 throwerSchrag1 = new BallThrowerUbung4(colliderSammleUbung4, player1Wippe, player2Wippe);
-  throwerSchrag1.SetShootProperties(3.5, 45, true);
+  System.out.println("player1Wippe.rot: " + player1Wippe.rot);
+   System.out.println("player2Wippe.rot: " + player2Wippe.rot);
+  throwerSchrag1.SetShootProperties(3.5, player1Wippe.rot);
   player1Ball.AttachComponent(throwerSchrag1);
   BallThrowerUbung4 throwerSchrag2 = new BallThrowerUbung4(colliderSammleUbung4, player1Wippe, player2Wippe);
-  throwerSchrag2.SetShootProperties(2, 45, false);
+  throwerSchrag2.SetShootProperties(2, 180+player2Wippe.rot);
   player2Ball.AttachComponent(throwerSchrag2);
   
   
