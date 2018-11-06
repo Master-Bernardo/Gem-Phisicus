@@ -36,12 +36,12 @@ class CollidersUbung4
     // System.out.println("y ball: r" + ball.posX);
     if(y> ball.posY - ball.scaleY/2)
     {
-      System.out.println("under");
+      //System.out.println("under");
       return new PVector(ball.posX,y + ball.scaleY/2);
     }
     else
     {
-     System.out.println("over");
+     //System.out.println("over");
       return null;
     }
   }
@@ -53,12 +53,12 @@ class CollidersUbung4
     // System.out.println("y ball: r" + ball.posX);
     if(y> ball.posY - ball.scaleY/2)
     {
-      System.out.println("under");
+      //System.out.println("under");
       return new PVector(ball.posX,y + ball.scaleY/2);
     }
     else
     {
-     System.out.println("over");
+     //System.out.println("over");
       return null;
     }
   }

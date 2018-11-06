@@ -167,4 +167,18 @@ class GameObject
     
     return pointsToReturn;
   }
+  
+  PVector GetVectorUp()
+  {
+    PVector up = new PVector(0,1);
+    up.rotate(radians(-rot));
+    return up;
+  }
+  
+  PVector GetVectorRight()
+  {
+    PVector right = new PVector(0,1);
+    right.rotate(radians(-rot - 90));
+    return right;
+  }
 }

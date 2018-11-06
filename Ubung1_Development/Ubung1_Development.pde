@@ -24,7 +24,7 @@ static float gravitation = 9.81f;
 
 void setup()
 {
-  timeScale = tRealLife;
+  timeScale = 0.25;
   size(1200,1000);
   smooth(8);
   frmRate = 60;        
@@ -91,6 +91,10 @@ void setup()
   currentScene.AddObjectToScene(player2Triangle);
   GameObject player2Wippe = new GameObject(0.6,0.06,-25,0.25,0.01, GameObjectType.Rectangle, color(#A2DFFF));
   currentScene.AddObjectToScene(player2Wippe);
+   GameObject testTriangle = new GameObject(player2Wippe.posX + player2Wippe.GetVectorUp().x*0.1 , player2Wippe.posY + player2Wippe.GetVectorUp().y*0.1,0,0.05,0.05, GameObjectType.Circle, color(255,0,0));
+  currentScene.AddObjectToScene(testTriangle);
+  GameObject testTriangle2 = new GameObject(player2Wippe.posX + player2Wippe.GetVectorRight().x*0.1 , player2Wippe.posY + player2Wippe.GetVectorRight().y*0.1,0,0.05,0.05, GameObjectType.Circle, color(0,255,0));
+  currentScene.AddObjectToScene(testTriangle2);
   /*
   PVector[] testVectors2 = player2Wippe.GetRectanglePoints();
   for(PVector vector: testVectors2)
@@ -112,6 +116,12 @@ void setup()
   RedBallMovement rBMovement = new RedBallMovement(0.138, true, player1Marker, player2Marker);  //0.138 m/s entsprechen 0.5km/h
   ball.AttachComponent(rBMovement);
   
+  //schräge ebene testung ball
+   GameObject schregball = new GameObject(0.01 ,0.05, 0, 0.032,0.032, GameObjectType.Circle, color(#08FCDA));
+  currentScene.AddObjectToScene(schregball);
+  SchragBallMovement schragMovement = new SchragBallMovement(0,0,-45);  
+  schregball.AttachComponent(schragMovement);
+  
   /*Übung 3 Objekte*/
   
   //Die Components für den freien Fall der Übung 3
@@ -124,10 +134,10 @@ void setup()
   //der Collider sammller der Wippen
   CollidersUbung4 colliderSammleUbung4 = new CollidersUbung4(player1Wippe,player2Wippe);
   
-  BallThrowerUbung4 throwerSchrag1 = new BallThrowerUbung4(colliderSammleUbung4);
+  BallThrowerUbung4 throwerSchrag1 = new BallThrowerUbung4(colliderSammleUbung4, player1Wippe, player2Wippe);
   throwerSchrag1.SetShootProperties(3.5, 45, true);
   player1Ball.AttachComponent(throwerSchrag1);
-  BallThrowerUbung4 throwerSchrag2 = new BallThrowerUbung4(colliderSammleUbung4);
+  BallThrowerUbung4 throwerSchrag2 = new BallThrowerUbung4(colliderSammleUbung4, player1Wippe, player2Wippe);
   throwerSchrag2.SetShootProperties(2, 45, false);
   player2Ball.AttachComponent(throwerSchrag2);
   
