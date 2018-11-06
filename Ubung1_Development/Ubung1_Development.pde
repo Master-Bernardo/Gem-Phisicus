@@ -137,10 +137,10 @@ void setup()
   BallThrowerUbung4 throwerSchrag1 = new BallThrowerUbung4(colliderSammleUbung4, player1Wippe, player2Wippe);
   System.out.println("player1Wippe.rot: " + player1Wippe.rot);
    System.out.println("player2Wippe.rot: " + player2Wippe.rot);
-  throwerSchrag1.SetShootProperties(3.5, player1Wippe.rot);
+  throwerSchrag1.SetShootProperties(3.5, 90-player1Wippe.rot);
   player1Ball.AttachComponent(throwerSchrag1);
   BallThrowerUbung4 throwerSchrag2 = new BallThrowerUbung4(colliderSammleUbung4, player1Wippe, player2Wippe);
-  throwerSchrag2.SetShootProperties(2, 180+player2Wippe.rot);
+  throwerSchrag2.SetShootProperties(2, 90-player2Wippe.rot);
   player2Ball.AttachComponent(throwerSchrag2);
   
   

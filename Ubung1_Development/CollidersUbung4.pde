@@ -32,8 +32,7 @@ class CollidersUbung4
   PVector CollidesWithWippeLeft(GameObject ball)
   {
     float y = steigungLinks * ball.posX + nLinks;
-    //System.out.println("y: " +  y);
-    // System.out.println("y ball: r" + ball.posX);
+    
     if(y> ball.posY - ball.scaleY/2)
     {
       //System.out.println("under");
@@ -49,8 +48,7 @@ class CollidersUbung4
   PVector CollidesWithWippeRight(GameObject ball)
   {
     float y = steigungRechts * ball.posX + nRechts;
-    //System.out.println("y: " +  y);
-    // System.out.println("y ball: r" + ball.posX);
+
     if(y> ball.posY - ball.scaleY/2)
     {
       //System.out.println("under");
