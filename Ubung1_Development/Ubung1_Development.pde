@@ -24,7 +24,7 @@ static float gravitation = 9.81f;
 
 void setup()
 {
-  timeScale = 0.25;
+  timeScale = 0.5;
   size(1200,1000);
   smooth(8);
   frmRate = 60;        

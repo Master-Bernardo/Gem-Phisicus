@@ -172,40 +172,6 @@ class BallThrowerUbung3 extends Component
   }
 }
 
-class BallThrowerUbung4Old extends Component
-{
-
-  float startYPosition;
-  float startXPosition;
-  Boolean throwing;
-  float startTime;
-  float startVelocity;  
-  float angle; //alpha - die Rotation in welche richtung der wurf beginnt
-  Boolean rightDirection; //true falls wir nach rechts schießen, false falls wir nach links schießen
-  
-  float velocityY ;
-  float velocityX;
-  
-  Boolean inAir; //this is true as long as the ball is in Air
-  //für die Bodenbewegung
-  GameObject untergrund; //- ist entweder eine der Wippen oder null falls wir den boden berührt haben
-  GameObject wippeRechts;
-  GameObject wippeLinks;
-  
-  CollidersUbung4 collidersUbung4;
-  
-  
-  //for gorund hit
-  float timeOfGroundHit;
-  float groundHitX;
-  float groundHitY;
-  float groundHitSpeedX;
-  float groundHitSpeedY;
-
-
-  
-}
-
 class BallThrowerUbung4 extends Component
 {
   Boolean throwing; // true if we hit the throw button
@@ -217,9 +183,8 @@ class BallThrowerUbung4 extends Component
   
   float startVelocityY;   //x und y Komponenten des Startgeschwindigkeit, genutzt bei der Formel des schrägen wurfes, sowie bei der schiefen Ebene
   float startVelocityX;
-  
-  float currentVelocityY;   
-  float currentVelocityX;
+
+  PVector currentVelocity;
   
   Boolean inAir; //this is true as long as the ball is in Air
   
@@ -243,6 +208,7 @@ class BallThrowerUbung4 extends Component
     this.wippeRechts = wippeRechts;
     this.wippeLinks = wippeLinks;
     throwing = false;
+    currentVelocity = new PVector(0,0);
   }
   
   void run()
@@ -253,11 +219,12 @@ class BallThrowerUbung4 extends Component
       if(inAir)  // wenn sich der Ball in der Luft befindet nutzen wir die Formel des Schrägen Wurfs
       {
         //1. movement berechnen
-        currentVelocityY = (float)(startYPosition + startVelocityY * (t-startTime) - gravitation/2 * Math.pow((t-startTime),2) - gameObject.posY)*frmRate;  
-        gameObject.posY += currentVelocityY/frmRate;//(float)(startYPosition + startVelocityY * (t-startTime) - gravitation/2 * Math.pow((t-startTime),2));
+        currentVelocity.y = (float)(startYPosition + startVelocityY * (t-startTime) - gravitation/2 * Math.pow((t-startTime),2) - gameObject.posY)/deltaTime;  
+        gameObject.posY += currentVelocity.y*deltaTime;//(float)(startYPosition + startVelocityY * (t-startTime) - gravitation/2 * Math.pow((t-startTime),2));
           
-        currentVelocityX = (float)(startXPosition + startVelocityX * (t-startTime) - gameObject.posX)*frmRate;
-        gameObject.posX += currentVelocityX/frmRate; //(float)(startXPosition + startVelocityX * (t-startTime));
+        currentVelocity.x = (float)(startXPosition + startVelocityX * (t-startTime) - gameObject.posX)/deltaTime;
+        gameObject.posX += currentVelocity.x*deltaTime; //(flo/frmRateat)(startXPosition + startVelocityX * (t-startTime));
+        
 
         //2. collisionChekck, ggf, movement korrigieren
         
@@ -273,15 +240,7 @@ class BallThrowerUbung4 extends Component
           System.out.println(groundHitX);
           groundHitY = gameObject.posY;
           
-          //long conversion of the current velocity length to the new on in another direction
-          PVector velocityX = new PVector(currentVelocityX,0);
-          PVector velocityY = new PVector(0,currentVelocityY);
-          PVector velocity =  velocityX.add(velocityY);
-          PVector newVelocity;
-          if(currentVelocityX>0) newVelocity = new PVector(velocity.mag(),0);
-          else   newVelocity = new PVector(-velocity.mag(),0);
-          startVelocityY = 0;
-          startVelocityX = newVelocity.x;
+          ConvertVelocity();
           return;
         }
         //hier chechen wir ob wir mit einer der  Wippen collidieren
@@ -295,14 +254,7 @@ class BallThrowerUbung4 extends Component
           groundHitX = gameObject.posX;
           groundHitY = gameObject.posY;
           
-          //startgeschwindigkeit bestimmen
-          PVector velocityX = new PVector(currentVelocityX,0);
-          PVector velocityY = new PVector(0,currentVelocityY);
-          PVector velocity =  velocityX.add(velocityY);
-          
-          PVector newVelocity = untergrund.GetVectorRight().mult(velocity.mag());
-          startVelocityX = -newVelocity.x;
-          startVelocityY = -newVelocity.y;
+          ConvertVelocity();
           
           return;
           
@@ -317,14 +269,7 @@ class BallThrowerUbung4 extends Component
           groundHitX = gameObject.posX;
           groundHitY = gameObject.posY;
           
-          //startgeschwindigkeit bestimmen
-          PVector velocityX = new PVector(currentVelocityX,0);
-          PVector velocityY = new PVector(0,currentVelocityY);
-          PVector velocity =  velocityX.add(velocityY);
-          
-          PVector newVelocity = untergrund.GetVectorRight().mult(velocity.mag());
-          startVelocityX = newVelocity.x;
-          startVelocityY = newVelocity.y;
+          ConvertVelocity();
 
 
           return;
@@ -344,10 +289,12 @@ class BallThrowerUbung4 extends Component
           alpha = -(90-degrees(PVector.angleBetween(up, untergrund.GetVectorUp())));
         }
 
-        currentVelocityX = (float)((-gravitation*Math.sin(radians(alpha))*Math.cos(radians(alpha))*(Math.pow((t-timeOfGroundHit),2)/2)+startVelocityX * (t-timeOfGroundHit) + groundHitX)-gameObject.posX)*frmRate;
-        gameObject.posX += currentVelocityX/frmRate;
-        currentVelocityY = (float)((-gravitation*Math.sin(radians(alpha))*Math.sin(radians(alpha))*(Math.pow((t-timeOfGroundHit),2)/2)+startVelocityY * (t-timeOfGroundHit) + groundHitY)-gameObject.posY)*frmRate;
-        gameObject.posY += currentVelocityY/frmRate;
+        currentVelocity.x = (float)((-gravitation*Math.sin(radians(alpha))*Math.cos(radians(alpha))*(Math.pow((t-timeOfGroundHit),2)/2)+startVelocityX * (t-timeOfGroundHit) + groundHitX)-gameObject.posX)/deltaTime;
+        gameObject.posX += currentVelocity.x * deltaTime;
+
+        currentVelocity.y = (float)((-gravitation*Math.sin(radians(alpha))*Math.sin(radians(alpha))*(Math.pow((t-timeOfGroundHit),2)/2)+startVelocityY * (t-timeOfGroundHit) + groundHitY)-gameObject.posY)/deltaTime;
+        gameObject.posY += currentVelocity.y * deltaTime;
+        
        
         //2. collision checks, korrigieren
       
@@ -356,43 +303,32 @@ class BallThrowerUbung4 extends Component
         {
           if(collidersUbung4.CollidesWithWippeLeft(gameObject)!=null) 
           {
+            System.out.println("1");
             gameObject.posY = collidersUbung4.CollidesWithWippeLeft(gameObject).y;
             untergrund = wippeLinks;
             timeOfGroundHit =t;
             groundHitX = gameObject.posX;
             groundHitY = gameObject.posY;
             //startgeschwindigkeit bestimmen
-            PVector velocityX = new PVector(currentVelocityX,0);
-            PVector velocityY = new PVector(0,currentVelocityY);
-            PVector velocity =  velocityX.add(velocityY);
-            
-            PVector newVelocity = untergrund.GetVectorRight().mult(velocity.mag());
-            startVelocityX = -newVelocity.x;
-            startVelocityY = -newVelocity.y;
+            ConvertVelocity();
           }
           else if(collidersUbung4.CollidesWithWippeRight(gameObject)!=null)
           {
+            System.out.println("2");
             gameObject.posY = collidersUbung4.CollidesWithWippeRight(gameObject).y;
             untergrund = wippeRechts;
             timeOfGroundHit =t;
             groundHitX = gameObject.posX;
             groundHitY = gameObject.posY;
              //startgeschwindigkeit bestimmen - erstmal nur anhand der xGeschwindigkeit
-            //startgeschwindigkeit bestimmen
-            PVector velocityX = new PVector(currentVelocityX,0);
-            PVector velocityY = new PVector(0,currentVelocityY);
-            PVector velocity =  velocityX.add(velocityY);
-            
-            PVector newVelocity = untergrund.GetVectorRight().mult(velocity.mag());
-            startVelocityX = newVelocity.x;
-            startVelocityY = newVelocity.y;
+            ConvertVelocity();
             }
         }
         //falls der Ball auf einer der Wippen ist, schauen wir ob er mit dem Boden kollidiert
         else if(gameObject.posY<=0  + gameObject.scaleY/2)
         {
+          System.out.println("3");
           gameObject.posY = gameObject.scaleY/2;
-          System.out.println("yep");
 
           untergrund = null;
           timeOfGroundHit =t;
@@ -400,28 +336,29 @@ class BallThrowerUbung4 extends Component
           groundHitX = gameObject.posX;
           groundHitY = gameObject.posY;
           
-          //long conversion of the current velocity length to the new on in another direction
-          PVector velocityX = new PVector(currentVelocityX,0);
-          PVector velocityY = new PVector(0,currentVelocityY);
-          PVector velocity =  velocityX.add(velocityY);
-          PVector newVelocity;
-          if(currentVelocityX>0) newVelocity = new PVector(velocity.mag(),0);
-          else   newVelocity = new PVector(-velocity.mag(),0);
-          startVelocityY = 0;
-          startVelocityX = newVelocity.x;
+          //vs = v* cos(alpha)
+          
+          ConvertVelocity();
         }
       }
     }
   }
   
   //diese Funktion übersetzt die aktuelle Geschwindigkeit des Balles in dieselbe geschwindigkeit, jedoch entland des Freiheitsgrades des untergrunds - noch nicht genutzt
-  PVector ConvertVelocity(float currentXSpeed, float currentYSpeed)
+  //wir nehmen uns jeweils die xKomponente des geshwindigkeitsvektors relativ zum Untergrund
+  PVector ConvertVelocity()
   {
-    PVector velocityX = new PVector(currentVelocityX,0);
-    PVector velocityY = new PVector(0,currentVelocityY);
-    PVector velocity =  velocityX.add(velocityY);
-            
-    PVector newVelocity = untergrund.GetVectorRight().mult(velocity.mag());
+    PVector newVelocity;
+    
+    if(untergrund!=null)
+    {
+      newVelocity = untergrund.GetVectorRight().mult(currentVelocity.x *  cos(untergrund.rot));
+    }
+    else
+    {
+       newVelocity = new PVector(1,0).mult(currentVelocity.x);
+    }
+
     startVelocityX = newVelocity.x;
     startVelocityY = newVelocity.y;
     
