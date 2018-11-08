@@ -75,7 +75,7 @@ class RedBallMovement extends Component
     } 
   }
 }
-
+//klasse zu Testzwecken der schiefen Ebene
 class SchragBallMovement extends Component
 {
   //die Y Speed beim Aufkommen sollte 0 betragen
@@ -174,19 +174,20 @@ class BallThrowerUbung3 extends Component
 
 class BallThrowerUbung4 extends Component
 {
-
+  Boolean throwing; // true if we hit the throw button
   float startYPosition;
   float startXPosition;
-  Boolean throwing;
   float startTime;
-  float startVelocity;  
-  float angle; //alpha - die Rotation in welche richtung der wurf beginnt
-  Boolean rightDirection; //true falls wir nach rechts schießen, false falls wir nach links schießen
+  float startVelocity;   //startGeschwindigkeit des Vrufes, in richtung des angles
+  float angle; //alpha - die Rotation in welche richtung der wurf beginnt, wird von der IWppe übernommen
   
-  float velocityY ;
-  float velocityX;
+  float startVelocityY;   //x und y Komponenten des Startgeschwindigkeit, genutzt bei der Formel des schrägen wurfes, sowie bei der schiefen Ebene
+  float startVelocityX;
+
+  PVector currentVelocity;
   
   Boolean inAir; //this is true as long as the ball is in Air
+  
   //für die Bodenbewegung
   GameObject untergrund; //- ist entweder eine der Wippen oder null falls wir den boden berührt haben
   GameObject wippeRechts;
@@ -194,13 +195,10 @@ class BallThrowerUbung4 extends Component
   
   CollidersUbung4 collidersUbung4;
   
-  
-  //for gorund hit
+  //for den GroundHit
   float timeOfGroundHit;
   float groundHitX;
   float groundHitY;
-  float groundHitSpeedX;
-  float groundHitSpeedY;
 
 
   
@@ -210,6 +208,7 @@ class BallThrowerUbung4 extends Component
     this.wippeRechts = wippeRechts;
     this.wippeLinks = wippeLinks;
     throwing = false;
+    currentVelocity = new PVector(0,0);
   }
   
   void run()
@@ -217,151 +216,153 @@ class BallThrowerUbung4 extends Component
     //physics Formel für freien Fall aus der Übung
     if(throwing)
     {
-       //System.out.println("hgspX: " + groundHitSpeedX);
       if(inAir)  // wenn sich der Ball in der Luft befindet nutzen wir die Formel des Schrägen Wurfs
       {
-        groundHitSpeedY = (float)(startYPosition + velocityY * (t-startTime) - gravitation/2 * Math.pow((t-startTime),2) - gameObject.posY)*frmRate;
-        //groundHitSpeedY = 0;
-        gameObject.posY =   (float)(startYPosition + velocityY * (t-startTime) - gravitation/2 * Math.pow((t-startTime),2));
+        //1. movement berechnen
+        currentVelocity.y = (float)(startYPosition + startVelocityY * (t-startTime) - gravitation/2 * Math.pow((t-startTime),2) - gameObject.posY)/deltaTime;  
+        gameObject.posY += currentVelocity.y*deltaTime;//(float)(startYPosition + startVelocityY * (t-startTime) - gravitation/2 * Math.pow((t-startTime),2));
+          
+        currentVelocity.x = (float)(startXPosition + startVelocityX * (t-startTime) - gameObject.posX)/deltaTime;
+        gameObject.posX += currentVelocity.x*deltaTime; //(flo/frmRateat)(startXPosition + startVelocityX * (t-startTime));
         
-       
+
+        //2. collisionChekck, ggf, movement korrigieren
         
-        //hier cheken wir ob er mit dem Boden kollidieren würde im nächsten Frame
+        //hier cheken wir ob er mit dem Boden kollidieren
         if(gameObject.posY<=0  + gameObject.scaleY/2)
         {
           gameObject.posY = 0 + gameObject.scaleY/2;
+          gameObject.posX = gameObject.posX;
           inAir=false;
           untergrund = null;
           timeOfGroundHit =t;
           groundHitX = gameObject.posX;
           System.out.println(groundHitX);
           groundHitY = gameObject.posY;
-
+          
+          ConvertVelocity();
           return;
         }
-        else if(collidersUbung4.CollidesWithWippeLeft(gameObject)!=null)  //hier chechen wir ob wir mit einer der Wippen collidieren
+        //hier chechen wir ob wir mit einer der  Wippen collidieren
+        else if(collidersUbung4.CollidesWithWippeLeft(gameObject)!=null)  
         {
           inAir=false;
           gameObject.posY = collidersUbung4.CollidesWithWippeLeft(gameObject).y;
+          gameObject.posX = gameObject.posX;
           untergrund = wippeLinks;
           timeOfGroundHit =t;
           groundHitX = gameObject.posX;
           groundHitY = gameObject.posY;
-
+          
+          ConvertVelocity();
+          
           return;
           
         }
-        else if(collidersUbung4.CollidesWithWippeRight(gameObject)!=null)
+        else if(collidersUbung4.CollidesWithWippeRight(gameObject)!=null)//hier chechen wir ob wir mit einer der lrechten Wippen collidieren
         {
           inAir=false;
           gameObject.posY = collidersUbung4.CollidesWithWippeRight(gameObject).y;
+          gameObject.posX = gameObject.posX;
           untergrund = wippeRechts;
           timeOfGroundHit =t;
           groundHitX = gameObject.posX;
           groundHitY = gameObject.posY;
+          
+          ConvertVelocity();
+
 
           return;
-        }
-        else
-        {
-           //dies ist zur vereinfachung, der bool right direction wechselt einfach die Richtung, sodass wir für beide Wippen den gleichen Winkel benutzen können, erstmal nur zu testzwecken
-          if(rightDirection) 
-          {
-            groundHitSpeedX = (float)(startXPosition + velocityX * (t-startTime) - gameObject.posX)*frmRate;
-            gameObject.posX = (float)(startXPosition + velocityX * (t-startTime));
-          }
-            else
-          {
-            groundHitSpeedX = (float)(startXPosition - velocityX * (t-startTime) - gameObject.posX)*frmRate;
-            gameObject.posX = (float)(startXPosition - velocityX * (t-startTime));
-          }
-        }
-        
-        
+        }    
       }
-      else       // wenn der Ball auf den Boden ankommt, nutzen wird die andere Formel - schiefe Ebene
+      
+      else    // wenn der Ball auf den Boden ankommt, nutzen wird die andere Formel - schiefe Ebene
       {
-        //1. checke ob wir unseren Untergrund geändert haben:
-        if(untergrund == null)
-        {
-          if(collidersUbung4.CollidesWithWippeLeft(gameObject)!=null)  //hier chechen wir ob wir mit einer der Wippen collidieren
-          {
-            //System.out.println("collides with left");
-            gameObject.posY = collidersUbung4.CollidesWithWippeLeft(gameObject).y;
-            untergrund = wippeLinks;
-            timeOfGroundHit =t;
-            groundHitX = gameObject.posX;
-            groundHitY = gameObject.posY;
-          }
-          else if(collidersUbung4.CollidesWithWippeRight(gameObject)!=null)
-          {
-            gameObject.posY = collidersUbung4.CollidesWithWippeRight(gameObject).y;
-            untergrund = wippeRechts;
-            timeOfGroundHit =t;
-            groundHitX = gameObject.posX;
-            groundHitY = gameObject.posY;
-          }
-        }
         
-        
+
+        //1. movement berechnen
         float alpha = 0; //der Winkel falls es eine Schräge Ebene ist
-        //groundHitSpeedX = 0.01;
         if(untergrund != null) // wenn auf Wippe
         {
           PVector up = new PVector(1,0);
           
           alpha = -(90-degrees(PVector.angleBetween(up, untergrund.GetVectorUp())));
-          //System.out.println("aplha: " + alpha);
         }
+
+        currentVelocity.x = (float)((-gravitation*Math.sin(radians(alpha))*Math.cos(radians(alpha))*(Math.pow((t-timeOfGroundHit),2)/2)+startVelocityX * (t-timeOfGroundHit) + groundHitX)-gameObject.posX)/deltaTime;
+        gameObject.posX += currentVelocity.x * deltaTime;
+
+        currentVelocity.y = (float)((-gravitation*Math.sin(radians(alpha))*Math.sin(radians(alpha))*(Math.pow((t-timeOfGroundHit),2)/2)+startVelocityY * (t-timeOfGroundHit) + groundHitY)-gameObject.posY)/deltaTime;
+        gameObject.posY += currentVelocity.y * deltaTime;
         
-        float hangabtriebskraft = (float)((gravitation * 1) * Math.sin(radians(alpha))); //erstmal nehmen wir die Masse 1
-        
-        //hangabtriebskraft in x und y Komponente zerlegen
-        float Fhx = (float)(hangabtriebskraft * Math.cos(radians(alpha)));
-        float Fhy = (float)(hangabtriebskraft * Math.sin(radians(alpha)));
-        
-        //Bewegungsgleichung in x und y Richtung
-        //float x = 0;
-        //float y = 0;
-        float x =(float)(-gravitation*Math.sin(radians(alpha))*Math.cos(radians(alpha))*(Math.pow((t-timeOfGroundHit),2)/2)+groundHitSpeedX * (t-timeOfGroundHit) + groundHitX);
-        float y = (float)(-gravitation*Math.sin(radians(alpha))*Math.sin(radians(alpha))*(Math.pow((t-timeOfGroundHit),2)/2)+groundHitSpeedY * (t-timeOfGroundHit) + groundHitY);
-        
-        if(gameObject.posY<=0  + gameObject.scaleY/2 && untergrund !=null)
+       
+        //2. collision checks, korrigieren
+      
+        //falls der untergrund null ist - also sich der Ball auf dem Boden bewegt, schauen wir ob er mit einer der Wippen kollidiert
+        if(untergrund == null)
         {
-           System.out.println("yep");
+          if(collidersUbung4.CollidesWithWippeLeft(gameObject)!=null) 
+          {
+            System.out.println("1");
+            gameObject.posY = collidersUbung4.CollidesWithWippeLeft(gameObject).y;
+            untergrund = wippeLinks;
+            timeOfGroundHit =t;
+            groundHitX = gameObject.posX;
+            groundHitY = gameObject.posY;
+            //startgeschwindigkeit bestimmen
+            ConvertVelocity();
+          }
+          else if(collidersUbung4.CollidesWithWippeRight(gameObject)!=null)
+          {
+            System.out.println("2");
+            gameObject.posY = collidersUbung4.CollidesWithWippeRight(gameObject).y;
+            untergrund = wippeRechts;
+            timeOfGroundHit =t;
+            groundHitX = gameObject.posX;
+            groundHitY = gameObject.posY;
+             //startgeschwindigkeit bestimmen - erstmal nur anhand der xGeschwindigkeit
+            ConvertVelocity();
+            }
+        }
+        //falls der Ball auf einer der Wippen ist, schauen wir ob er mit dem Boden kollidiert
+        else if(gameObject.posY<=0  + gameObject.scaleY/2)
+        {
+          System.out.println("3");
+          gameObject.posY = gameObject.scaleY/2;
+
           untergrund = null;
+          timeOfGroundHit =t;
           alpha = 0;
-
-          groundHitSpeedX = (x-gameObject.posX)*frmRate;
-
-          timeOfGroundHit = t;
-          groundHitSpeedY = 0;
           groundHitX = gameObject.posX;
           groundHitY = gameObject.posY;
           
+          //vs = v* cos(alpha)
           
-          x = (float)(-gravitation*Math.sin(radians(alpha))*Math.cos(radians(alpha))*(Math.pow((t-timeOfGroundHit),2)/2)+groundHitSpeedX * (t-timeOfGroundHit) + groundHitX);
-          y = (float)(-gravitation*Math.sin(radians(alpha))*Math.sin(radians(alpha))*(Math.pow((t-timeOfGroundHit),2)/2)+groundHitSpeedY * (t-timeOfGroundHit) + groundHitY);
-          
-        }else if(gameObject.posY<=0  + gameObject.scaleY/2)
-        {
-          y = gameObject.scaleY/2;
+          ConvertVelocity();
         }
-        //vllcht
-        else if(collidersUbung4.CollidesWithWippeLeft(gameObject)!=null)  //hier chechen wir ob wir mit einer der Wippen collidieren
-        {
-            y = collidersUbung4.CollidesWithWippeLeft(gameObject).y;
-        }
-        else if(collidersUbung4.CollidesWithWippeRight(gameObject)!=null)
-        {
-            y = collidersUbung4.CollidesWithWippeRight(gameObject).y;
-        }
-        
-        gameObject.posX = x;
-        gameObject.posY = y;
       }
-        
     }
+  }
+  
+  //diese Funktion übersetzt die aktuelle Geschwindigkeit des Balles in dieselbe geschwindigkeit, jedoch entland des Freiheitsgrades des untergrunds - noch nicht genutzt
+  //wir nehmen uns jeweils die xKomponente des geshwindigkeitsvektors relativ zum Untergrund
+  PVector ConvertVelocity()
+  {
+    PVector newVelocity;
+    
+    if(untergrund!=null)
+    {
+      newVelocity = untergrund.GetVectorRight().mult(currentVelocity.x *  cos(untergrund.rot));
+    }
+    else
+    {
+       newVelocity = new PVector(1,0).mult(currentVelocity.x);
+    }
+
+    startVelocityX = newVelocity.x;
+    startVelocityY = newVelocity.y;
+    
+    return newVelocity;
   }
   
   void SetGameObject(GameObject gameObject)
@@ -369,20 +370,19 @@ class BallThrowerUbung4 extends Component
     this.gameObject = gameObject;
   }
   
-  void SetShootProperties(float startVelocity, float angle, Boolean rightDirection)
+  void SetShootProperties(float startVelocity, float angle)
   {
-    this.rightDirection = rightDirection;
     this.startVelocity = startVelocity;
     this.angle = angle;
-    velocityY = (float)(startVelocity * Math.sin(radians(angle)));
-    velocityX = (float)(startVelocity * Math.cos(radians(angle)));
+    startVelocityY = (float)(startVelocity * Math.sin(radians(angle)));
+    startVelocityX = (float)(startVelocity * Math.cos(radians(angle)));
   }
   
   void SetStartVelocity(float startVelocity) //called by slider
   {
     this.startVelocity = startVelocity;
-    velocityY = (float)(startVelocity * Math.sin(radians(angle)));
-    velocityX = (float)(startVelocity * Math.cos(radians(angle)));
+    startVelocityY = (float)(startVelocity * Math.sin(radians(angle)));
+    startVelocityX = (float)(startVelocity * Math.cos(radians(angle)));
   }
   
   void ShootBall()
