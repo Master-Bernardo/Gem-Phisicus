@@ -120,6 +120,110 @@ class SchragBallMovement extends Component
         
         gameObject.posX = x;
         gameObject.posY = y;
+        
+  }
+}
+
+//klasse zu Testzwecken der schiefen Ebene
+class SchragBallMovementMitReibung extends Component
+{
+  //die Y Speed beim Aufkommen sollte 0 betragen
+  //for gorund hit
+  float timeOfGroundHit;
+  float groundHitX;
+  float groundHitY;
+  float groundHitSpeed;
+  float alpha = 0;
+  float mRollreibung;
+  float mHaftreibung;
+  Boolean moving; //bewegt sich das Objekt oder liegt es auf dem Untergrund?
+  PVector currentVelocity;
+  
+  SchragBallMovementMitReibung(float groundHitX, float groundHitY, float groundHitSpeed, float alpha,float mRollreibung, float mHaftreibung)
+  {
+    this.alpha = alpha;
+    timeOfGroundHit = t;
+    this.groundHitX = groundHitX;
+    this.groundHitY = groundHitY;
+    this.groundHitSpeed = groundHitSpeed;
+    this.mRollreibung = mRollreibung;
+    this.mHaftreibung = mHaftreibung;
+    moving = false;
+    currentVelocity = new PVector(0,0);
+  }
+  
+  @Override
+  void SetGameObject(GameObject gameObject)
+  {
+    this.gameObject = gameObject;
+    this.groundHitX = gameObject.posX;
+    this.groundHitY = gameObject.posY;
+  }
+  
+  void run()
+  {
+    
+        if(moving)
+        {
+                    
+          //wenn sich der Ball bewegt, schauen wir ob ér seine Richtung in diesem frame wechseln wird, falls dies erfolgen würde, stoppen wir den Ball - der Ball würde seine Richtung ändern, wenn die Reibungskraft zu stark wird
+          // außerdem muss die richtung der Reibungskraft angepasst werden
+          if(groundHitSpeed<0)
+          {
+             mRollreibung = abs(mRollreibung);
+        
+            if(currentVelocity.x>0)//befor er anfängt in die andere Reichtung zu rollen durch die entgegengesetzte Reibungskaraft, stoppen iwr ihn
+            {
+              moving = false;
+              groundHitSpeed = 0;
+              timeOfGroundHit = t;
+              groundHitX = gameObject.posX;
+              groundHitY = gameObject.posY;
+            }
+          }
+          else if(groundHitSpeed>0)
+          {
+            mRollreibung = -abs(mRollreibung);
+        
+            if(currentVelocity.x<0) //befor er anfängt in die andere Reichtung zu rollen durch die entgegengesetzte Reibungskaraft, stoppen iwr ihn
+            {
+              moving = false;
+              groundHitSpeed = 0;
+              timeOfGroundHit = t;
+              groundHitX = gameObject.posX;
+              groundHitY = gameObject.posY;
+            }
+          }
+          else
+          {
+          }
+            
+          
+          if(moving)
+          {
+            float strecke = (float)(0 + groundHitSpeed*(t-timeOfGroundHit) - gravitation * (sin(radians(alpha)) - mRollreibung * cos(radians(alpha))) * (Math.pow((t-timeOfGroundHit),2)/2));
+
+            
+            currentVelocity.x = groundHitX + (float)(strecke * Math.cos(radians(alpha)))-gameObject.posX;
+            currentVelocity.y = groundHitY + (float)(strecke * Math.sin(radians(alpha)))-gameObject.posY;
+            
+              
+            gameObject.posX += currentVelocity.x;
+            gameObject.posY += currentVelocity.y;
+          }
+
+          
+        }
+        else
+        {
+            if(abs(alpha)>degrees(atan(mHaftreibung)) || abs(groundHitSpeed)>0)
+            {
+              moving = true;
+              timeOfGroundHit = t;
+            }
+        }
+        
+       
   }
 }
 
@@ -199,16 +303,20 @@ class BallThrowerUbung4 extends Component
   float timeOfGroundHit;
   float groundHitX;
   float groundHitY;
+  
+  //Reibung
+  float mRollreibung = 0.2;
 
 
   
-  BallThrowerUbung4(CollidersUbung4 collidersUbung4, GameObject wippeLinks, GameObject wippeRechts)
+  BallThrowerUbung4(CollidersUbung4 collidersUbung4, GameObject wippeLinks, GameObject wippeRechts, float mRollreibung)
   {
     this.collidersUbung4 = collidersUbung4;
     this.wippeRechts = wippeRechts;
     this.wippeLinks = wippeLinks;
     throwing = false;
     currentVelocity = new PVector(0,0);
+    this.mRollreibung = mRollreibung;
   }
   
   void run()
@@ -288,13 +396,37 @@ class BallThrowerUbung4 extends Component
           
           alpha = -(90-degrees(PVector.angleBetween(up, untergrund.GetVectorUp())));
         }
-
+        /*
         currentVelocity.x = (float)((-gravitation*Math.sin(radians(alpha))*Math.cos(radians(alpha))*(Math.pow((t-timeOfGroundHit),2)/2)+startVelocityX * (t-timeOfGroundHit) + groundHitX)-gameObject.posX)/deltaTime;
         gameObject.posX += currentVelocity.x * deltaTime;
 
         currentVelocity.y = (float)((-gravitation*Math.sin(radians(alpha))*Math.sin(radians(alpha))*(Math.pow((t-timeOfGroundHit),2)/2)+startVelocityY * (t-timeOfGroundHit) + groundHitY)-gameObject.posY)/deltaTime;
         gameObject.posY += currentVelocity.y * deltaTime;
+        */
+        //mit Reibung
+        PVector startVelocityVector = new PVector(startVelocityX,startVelocityY);
+        float startVelocityFloat = startVelocityVector.mag();
+
+        if(startVelocityX<0)
+        {
+          startVelocityFloat = -startVelocityFloat;
+        }
+                System.out.println(startVelocityFloat);
+
+        System.out.println(startVelocityFloat);
+        float hangabtriebskraft =(float)( -gravitation * (sin(radians(alpha))- mRollreibung *cos(radians(alpha))) * (Math.pow((t-timeOfGroundHit),2)/2))+ startVelocityFloat * (t-timeOfGroundHit) - 0;
+        //System.out.println(hangabtriebskraft);
+        //if(alpha>atan(mHaftreibung)) System.out.println("jetzt");
+        //float y = (float)(0 + groundHitSpeedY + (t-timeOfGroundHit) + -gravitation * (sin(radians(alpha))- mRollreibung *cos(radians(alpha))) * (Math.pow((t-timeOfGroundHit),2)/2));
         
+        float Fhx = (float)(hangabtriebskraft * Math.cos(radians(alpha)));
+        float Fhy = (float)(hangabtriebskraft * Math.sin(radians(alpha)));
+        
+        currentVelocity.x = (groundHitX + Fhx)-gameObject.posX;
+        currentVelocity.y = (groundHitY + Fhy)-gameObject.posY;
+        
+        gameObject.posX += currentVelocity.x ;
+        gameObject.posY += currentVelocity.y;
        
         //2. collision checks, korrigieren
       
@@ -303,7 +435,6 @@ class BallThrowerUbung4 extends Component
         {
           if(collidersUbung4.CollidesWithWippeLeft(gameObject)!=null) 
           {
-            System.out.println("1");
             gameObject.posY = collidersUbung4.CollidesWithWippeLeft(gameObject).y;
             untergrund = wippeLinks;
             timeOfGroundHit =t;
@@ -314,7 +445,6 @@ class BallThrowerUbung4 extends Component
           }
           else if(collidersUbung4.CollidesWithWippeRight(gameObject)!=null)
           {
-            System.out.println("2");
             gameObject.posY = collidersUbung4.CollidesWithWippeRight(gameObject).y;
             untergrund = wippeRechts;
             timeOfGroundHit =t;
@@ -327,7 +457,6 @@ class BallThrowerUbung4 extends Component
         //falls der Ball auf einer der Wippen ist, schauen wir ob er mit dem Boden kollidiert
         else if(gameObject.posY<=0  + gameObject.scaleY/2)
         {
-          System.out.println("3");
           gameObject.posY = gameObject.scaleY/2;
 
           untergrund = null;

@@ -24,7 +24,7 @@ static float gravitation = 9.81f;
 
 void setup()
 {
-  timeScale = 0.5;
+  timeScale = 0.35;
   size(1200,1000);
   smooth(8);
   frmRate = 60;        
@@ -117,10 +117,16 @@ void setup()
   ball.AttachComponent(rBMovement);
   
   //schräge ebene testung ball
-   GameObject schregball = new GameObject(0.01 ,0.05, 0, 0.032,0.032, GameObjectType.Circle, color(#08FCDA));
+  GameObject schregball = new GameObject(0 ,0, 0, 0.032,0.032, GameObjectType.Circle, color(#08FCDA));
   currentScene.AddObjectToScene(schregball);
-  SchragBallMovement schragMovement = new SchragBallMovement(0,0,-45);  
+  SchragBallMovementMitReibung schragMovement = new SchragBallMovementMitReibung(0,0,1,0,0.5,0.4);  
   schregball.AttachComponent(schragMovement);
+  
+  //ohne Reibung
+  GameObject schregball2 = new GameObject(0 ,0, 0, 0.032,0.032, GameObjectType.Circle, color(#D700F0));
+  currentScene.AddObjectToScene(schregball2);
+  SchragBallMovement schragMovement2 = new SchragBallMovement(0,0,25);  
+  schregball2.AttachComponent(schragMovement2);
   
   /*Übung 3 Objekte*/
   
@@ -134,12 +140,12 @@ void setup()
   //der Collider sammller der Wippen
   CollidersUbung4 colliderSammleUbung4 = new CollidersUbung4(player1Wippe,player2Wippe);
   
-  BallThrowerUbung4 throwerSchrag1 = new BallThrowerUbung4(colliderSammleUbung4, player1Wippe, player2Wippe);
+  BallThrowerUbung4 throwerSchrag1 = new BallThrowerUbung4(colliderSammleUbung4, player1Wippe, player2Wippe,0.002);
   System.out.println("player1Wippe.rot: " + player1Wippe.rot);
    System.out.println("player2Wippe.rot: " + player2Wippe.rot);
   throwerSchrag1.SetShootProperties(3.5, 90-player1Wippe.rot);
   player1Ball.AttachComponent(throwerSchrag1);
-  BallThrowerUbung4 throwerSchrag2 = new BallThrowerUbung4(colliderSammleUbung4, player1Wippe, player2Wippe);
+  BallThrowerUbung4 throwerSchrag2 = new BallThrowerUbung4(colliderSammleUbung4, player1Wippe, player2Wippe,0.7);
   throwerSchrag2.SetShootProperties(2, 90-player2Wippe.rot);
   player2Ball.AttachComponent(throwerSchrag2);
   
